@@ -1,37 +1,35 @@
-import { useState, useRef, useCallBack, useEffect } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 
 
 export const useCamera = () => {
-    //позже положу сюда камеру UseRef чтобы каждый раз заново не отрисовывать
+    //позже положу сюда камеру, UseRef чтобы каждый раз заново не отрисовывать
     const webcamRef = useRef(null)
-    const [isCameraReady, seyIsCameraReady] = useState(false); //готовность камеры
+    const [isCameraReady, setCameraReady] = useState(false); //готовность камеры
     const [cameraError, setCameraError] = useState(null); //ошибка
 
 
     //параметры для камеры
-    const videoConstraints = {
+    const videoConstraints = useMemo(() => ({
         width: 640,
         height: 480,
-        facingmode: 'User'
-    };
+        facingmode: 'user'
+    }), []);
     //когда ошибка при подготовке камеры
-    const handleError = useCallBack((error) => {
+    const handleError = useCallback((error) => {
         setCameraError(error.message)
         setCameraReady(false)
     }, []);
     //когда камера готова
-    const handleUserMedia = useCallBack(() => {
+    const handleUserMedia = useCallback(() => {
         setCameraError(null)
         setCameraReady(true)
     }, []);
-    return (
+    return {
         webcamRef,
         isCameraReady,
         cameraError,
         handleError,
         handleUserMedia,
         videoConstraints
-
-
-    )
+    }
 }
