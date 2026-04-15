@@ -9,11 +9,11 @@ export const useCamera = () => {
 
 
     //параметры для камеры
-    const videoConstraints = useMemo(() => ({
+    const videoConstraints = {
         width: 640,
         height: 480,
         facingmode: 'user'
-    }), []);
+    };
     //когда ошибка при подготовке камеры
     const handleError = useCallback((error) => {
         setCameraError(error.message)
@@ -21,7 +21,7 @@ export const useCamera = () => {
     }, []);
     //когда камера готова
     const handleUserMedia = useCallback(() => {
-        setCameraError(null)
+        setCameraError()
         setCameraReady(true)
     }, []);
     return {
