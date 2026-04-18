@@ -23,7 +23,7 @@ const CameraView = () => {
         
         const interval = setInterval(async () => {
             const video = webcamRef.current.video;
-            if (video && video.readyState === 4) {
+            if (video && video.readyState === 4) { //4 - камера готова
                 const detected = await analyzeGesture(video);
                 if (detected !== 'none') {
                     setCurrentGesture(detected);
@@ -66,7 +66,7 @@ const CameraView = () => {
                     <div className={styles.overlay}>
                         <div className={styles.loader}></div>
                         <p>
-                            {isModelLoading 
+                            {!isCameraReady
                                 ? '🔄 Загрузка модели распознавания...' 
                                 : '📷 Запрос доступа к камере...'}
                         </p>
