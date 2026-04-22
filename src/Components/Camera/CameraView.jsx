@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { useCamera } from '../../Hooks/useCamera';
 import { useHandGesture } from '../../Hooks/UseHandGesture';
+import GameArea from '../Game/GameArea';
 import styles from './CameraView.module.css';
 
 const CameraView = () => {
@@ -106,6 +107,7 @@ const CameraView = () => {
                     {!isModelLoading ? '🧠 ИИ' : '⏳ ИИ'}
                 </span>
             </div>
+              <GameArea isCameraReady={isCameraReady} webcamRef={webcamRef} />
         </div>
     );
 };

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
-import { WIN_RULES, GAME_SETTINGS, ROUND_RESULTS } from '../utils/gameConstants';
+import { WIN_RULES, GAME_SETTINGS, ROUND_RESULTS } from '../utils/gameconstant';
 
 // Начальное состояние
 const initialState = {

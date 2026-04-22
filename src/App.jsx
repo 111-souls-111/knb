@@ -1,9 +1,11 @@
 import React  from 'react';
 import { CameraView } from './Components/Camera';
 import styles from './App.module.css';
+import { GameProvider } from '../src/Context/gamecontext';
 
 function App() {
   return (
+       <GameProvider>
  <div className={styles.app}>
       <header className={styles.header}>
         <h1 className={styles.title}>
@@ -13,6 +15,9 @@ function App() {
           Покажите жест в камеру!
         </p>
       </header>
+                      <main className={styles.main}>
+                    <CameraView />
+                </main>
       
       <main className={styles.main}>
         <CameraView />
@@ -22,6 +27,7 @@ function App() {
         <p>Сделайте жест: 👊 Камень | ✋ Бумага | ✌️ Ножницы</p>
       </footer>
     </div>
+    </GameProvider>
   );
 }
 
