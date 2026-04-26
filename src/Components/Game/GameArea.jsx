@@ -85,7 +85,7 @@ const GameArea = ({ isCameraReady, webcamRef }) => {
 
     // Получение текста результата
     const getResultText = () => {
-        if (roundResult === ROUND_RESULTS.WIN) return '🎉 Победа! 🎉';
+        if (roundResult === ROUND_RESULTS.WIN) return 'Победа!';
         if (roundResult === ROUND_RESULTS.LOSE) return '💻 Поражение! 💻';
         if (roundResult === ROUND_RESULTS.DRAW) return '🤝 Ничья! 🤝';
         return '';
@@ -105,10 +105,10 @@ const GameArea = ({ isCameraReady, webcamRef }) => {
     }
 
     // Экран окончания игры
-    if (gameStatus === 'gameOver' && winner) {
+    if ((gameStatus === 'gameOver')) {
         return (
             <div className={styles.gameOverScreen}>
-                <h2>{winner === 'player' ? '🏆 ПОБЕДА! 🏆' : '💻 ПОРАЖЕНИЕ! 💻'}</h2>
+                <h2>{getResultText}</h2>
                 <div className={styles.finalScore}>Счет: {playerScore} : {computerScore}</div>
                 <button onClick={resetGame} className={styles.playAgainBtn}>
                     Играть снова
