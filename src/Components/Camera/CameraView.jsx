@@ -24,7 +24,7 @@ const CameraView = () => {
         
         const interval = setInterval(async () => {
             const video = webcamRef.current.video;
-            if (video && video.readyState === 4) { //4 - камера готова
+            if (video && video.readyState === 4) {
                 const detected = await analyzeGesture(video);
                 if (detected !== 'none') {
                     setCurrentGesture(detected);
@@ -49,65 +49,68 @@ const CameraView = () => {
     const gestureDisplay = getGestureDisplay();
 
     return (
-        <div className={styles.cameraContainer}>
-            <div className={styles.videoWrapper}>
-                <Webcam
-                    key="webcam-instance"
-                    audio={false}
-                    ref={webcamRef}
-                    screenshotFormat="image/jpeg"
-                    videoConstraints={videoConstraints}
-                    onUserMedia={handleUserMedia}
-                    onError={handleError}
-                    className={styles.video}
-                />
+        <div className={styles.twoColumnsContainer}>
+            {/* Левая колонка */}
+            <div className={styles.leftColumn}>
+                <div className={styles.videoWrapper}>
+                    <Webcam
+                        key="webcam-instance"
+                        audio={false}
+                        ref={webcamRef}
+                        screenshotFormat="image/jpeg"
+                        videoConstraints={videoConstraints}
+                        onUserMedia={handleUserMedia}
+                        onError={handleError}
+                        className={styles.video}
+                    />
+                    
+                    {(isModelLoading || !isCameraReady) && (
+                        <div className={styles.overlay}>
+                            <div className={styles.loader}></div>
+                            <p>
+                                {!isCameraReady
+                                    ? '🔄 Загрузка модели распознавания...' 
+                                    : '📷 Запрос доступа к камере...'}
+                            </p>
+                        </div>
+                    )}
+                    
+                    {cameraError && (
+                        <div className={styles.errorOverlay}>
+                            <p>⚠️ Ошибка: {cameraError}</p>
+                            <button 
+                                onClick={() => window.location.reload()} 
+                                className={styles.retryButton}
+                            >
+                                Попробовать снова
+                            </button>
+                        </div>
+                    )}
+                </div>
                 
-                {/* Затемнение при загрузке */}
-                {(isModelLoading || !isCameraReady) && (
-                    <div className={styles.overlay}>
-                        <div className={styles.loader}></div>
-                        <p>
-                            {!isCameraReady
-                                ? '🔄 Загрузка модели распознавания...' 
-                                : '📷 Запрос доступа к камере...'}
-                        </p>
+                <div className={styles.gestureCard}>
+                    <div className={styles.gestureEmoji}>
+                        {gestureDisplay.emoji}
                     </div>
-                )}
+                    <div className={styles.gestureText}>
+                        {gestureDisplay.text}
+                    </div>
+                </div>
                 
-                {/* Ошибка */}
-                {cameraError && (
-                    <div className={styles.errorOverlay}>
-                        <p>⚠️ Ошибка: {cameraError}</p>
-                        <button 
-                            onClick={() => window.location.reload()} 
-                            className={styles.retryButton}
-                        >
-                            Попробовать снова
-                        </button>
-                    </div>
-                )}
+                <div className={styles.statusContainer}>
+                    <span className={isCameraReady ? styles.statusOk : styles.statusWait}>
+                        {isCameraReady ? '✅ Камера' : '⏳ Камера'}
+                    </span>
+                    <span className={!isModelLoading ? styles.statusOk : styles.statusWait}>
+                        {!isModelLoading ? '🧠 ИИ' : '⏳ ИИ'}
+                    </span>
+                </div>
             </div>
             
-            {/* Отображение распознанного жеста */}
-            <div className={styles.gestureCard}>
-                <div className={styles.gestureEmoji}>
-                    {gestureDisplay.emoji}
-                </div>
-                <div className={styles.gestureText}>
-                    {gestureDisplay.text}
-                </div>
+            {/* Правая колонка */}
+            <div className={styles.rightColumn}>
+                <GameArea isCameraReady={isCameraReady} webcamRef={webcamRef} />
             </div>
-            
-            {/* Статус */}
-            <div className={styles.statusContainer}>
-                <span className={isCameraReady ? styles.statusOk : styles.statusWait}>
-                    {isCameraReady ? '✅ Камера' : '⏳ Камера'}
-                </span>
-                <span className={!isModelLoading ? styles.statusOk : styles.statusWait}>
-                    {!isModelLoading ? '🧠 ИИ' : '⏳ ИИ'}
-                </span>
-            </div>
-              <GameArea isCameraReady={isCameraReady} webcamRef={webcamRef} />
         </div>
     );
 };

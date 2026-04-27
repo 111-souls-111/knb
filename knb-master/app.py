@@ -4,7 +4,10 @@ from database.auth import init_db, add_user, get_user
 from pasword.secur import hash_password, verify_password, validate_credentials
 
 app = Flask(__name__)
-CORS(app) 
+CORS(app, origins=[
+    "https://knb-mmelnikov750-qyxa.onreza.app",
+    "https://knb-master.amvera.io"
+])
 
 
 @app.route("/")

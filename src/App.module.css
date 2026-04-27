@@ -1,9 +1,223 @@
-.app {}
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+
+/* Header */
 
 .header {
     text-align: center;
+    padding: 1rem 2rem;
+    color: white;
+    background: rgba(0, 0, 0, 0.1);
 }
+
+.headerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.title {
+    font-size: 1.8rem;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.subtitle {
+    font-size: 1rem;
+    opacity: 0.95;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 40px;
+    font-size: 14px;
+}
+
+.logoutBtn {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(1.02);
+}
+
+
+/* Main content — две колонки */
+
+.main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.twoColumns {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.leftColumn {
+    flex: 1.2;
+    min-width: 320px;
+}
+
+.rightColumn {
+    flex: 0.8;
+    min-width: 320px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Footer */
 
 .footer {
     text-align: center;
+    padding: 1rem;
+    color: white;
+    background: rgba(0, 0, 0, 0.2);
+    font-size: 0.85rem;
+}
+
+
+/* Loading */
+
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* Responsive — на телефонах колонки становятся вертикальными */
+
+@media (max-width: 768px) {
+    .headerContent {
+        flex-direction: column;
+        text-align: center;
+    }
+    .twoColumns {
+        flex-direction: column;
+    }
+    .leftColumn,
+    .rightColumn {
+        flex: auto;
+    }
+    .title {
+        font-size: 1.4rem;
+    }
+    .main {
+        padding: 1rem;
+    }
+}
+
+
+/* Добавить, если нет этих стилей */
+
+.headerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 40px;
+    font-size: 14px;
+}
+
+.logoutBtn {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(1.02);
+}
+
+.main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+/* Адаптив */
+
+@media (max-width: 768px) {
+    .headerContent {
+        flex-direction: column;
+        text-align: center;
+    }
+    .title {
+        font-size: 1.5rem;
+    }
+    .main {
+        padding: 1rem;
+    }
 }
