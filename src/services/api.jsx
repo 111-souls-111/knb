@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // URL вашего Flask сервера
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'https://knb-master.amvera.io';
 
 const api = axios.create({
     baseURL: BASE_URL,

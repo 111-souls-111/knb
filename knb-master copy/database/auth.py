@@ -1,11 +1,7 @@
 import sqlite3
-import os
-
-# Определяем путь к базе данных в зависимости от окружения
-DATABASE = "/data/users.db" if "AMVERA" in os.environ else "users.db"
-
+DATABASE = 'users.db'
 def init_db():
-    conn = sqlite3.connect(DATABASE)
+    conn = sqlite3.connect('users.db')
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
@@ -16,10 +12,9 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
-    print(f"База данных инициализирована: {DATABASE}")
 
 def get_db():
-    conn = sqlite3.connect(DATABASE)
+    conn = sqlite3.connect('users.db')
     conn.row_factory = sqlite3.Row
     return conn
 
