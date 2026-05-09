@@ -60,7 +60,8 @@ const gameReducer = (state, action) => {
                 roundResult: action.payload.result,
                 playerScore: action.payload.playerScore,
                 computerScore: action.payload.computerScore,
-                gameStatus: action.payload.gameOver ? 'gameOver' : 'roundEnd'
+                gameStatus: action.payload.gameOver ? 'gameOver' : 'roundEnd',
+                winner:action.payload.usewinner
             };
 
         case ACTIONS.NEXT_ROUND:
@@ -70,7 +71,8 @@ const gameReducer = (state, action) => {
                 computerGesture: null,
                 roundResult: null,
                 gameStatus: 'countdown',
-                countdown: null
+                countdown: null,
+                winner:null
             };
 
         case ACTIONS.RESET_GAME:
@@ -105,12 +107,21 @@ export const GameProvider = ({children}) => {
         const gameOver = newPlayerScore >= GAME_SETTINGS.SCORE_TO_WIN || 
         newComputerScore >= GAME_SETTINGS.SCORE_TO_WIN;
 
+        let winner = null
+        if  (newPlayerScore >= GAME_SETTINGS.SCORE_TO_WIN){
+            winner=true
+        }
+        else{
+            winner=false
+        }
+
         dispath({
             type: ACTIONS.FINISH_ROUND,
             payload: {
                 result, 
                 playerScore: newPlayerScore,
                 computerScore: newComputerScore,
+                usewinner:winner,
                 gameOver
             }
         });

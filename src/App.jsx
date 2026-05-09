@@ -7,53 +7,53 @@ import Register from './Components/auth/Register';
 import { authService } from './services/authservice';
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [username, setUsername] = useState(null);
-    const [showRegister, setShowRegister] = useState(false);
-    const [isChecking, setIsChecking] = useState(true);
+    // const [isAuthenticated, setIsAuthenticated] = useState(false);
+    // const [username, setUsername] = useState(null);
+    // const [showRegister, setShowRegister] = useState(false);
+    // const [isChecking, setIsChecking] = useState(true);
 
-    useEffect(() => {
-        const isAuth = authService.isAuthenticated();
-        const user = authService.getUsername();
+    // useEffect(() => {
+    //     const isAuth = authService.isAuthenticated();
+    //     const user = authService.getUsername();
         
-        setIsAuthenticated(isAuth);
-        setUsername(user);
-        setIsChecking(false);
-    }, []);
+    //     setIsAuthenticated(isAuth);
+    //     setUsername(user);
+    //     setIsChecking(false);
+    // }, []);
 
-    const handleLoginSuccess = (user) => {
-        setUsername(user.username);
-        setIsAuthenticated(true);
-    };
+    // const handleLoginSuccess = (user) => {
+    //     setUsername(user.username);
+    //     setIsAuthenticated(true);
+    // };
 
-    const handleLogout = () => {
-        authService.logout();
-        setUsername(null);
-        setIsAuthenticated(false);
-    };
+    // const handleLogout = () => {
+    //     authService.logout();
+    //     setUsername(null);
+    //     setIsAuthenticated(false);
+    // };
 
-    if (isChecking) {
-        return (
-            <div className={styles.loadingContainer}>
-                <div className={styles.loader}></div>
-                <p>Проверка авторизации...</p>
-            </div>
-        );
-    }
+    // if (isChecking) {
+    //     return (
+    //         <div className={styles.loadingContainer}>
+    //             <div className={styles.loader}></div>
+    //             <p>Проверка авторизации...</p>
+    //         </div>
+    //     );
+    // }
 
-    if (!isAuthenticated) {
-        return showRegister ? (
-            <Register 
-                onRegisterSuccess={() => setShowRegister(false)}
-                onSwitchToLogin={() => setShowRegister(false)}
-            />
-        ) : (
-            <Login 
-                onLoginSuccess={handleLoginSuccess}
-                onSwitchToRegister={() => setShowRegister(true)}
-            />
-        );
-    }
+    // if (!isAuthenticated) {
+    //     return showRegister ? (
+    //         <Register 
+    //             onRegisterSuccess={() => setShowRegister(false)}
+    //             onSwitchToLogin={() => setShowRegister(false)}
+    //         />
+    //     ) : (
+    //         <Login 
+    //             onLoginSuccess={handleLoginSuccess}
+    //             onSwitchToRegister={() => setShowRegister(true)}
+    //         />
+    //     );
+    // }
 
     return (
         <GameProvider>
@@ -63,12 +63,12 @@ function App() {
                         <h1 className={styles.title}>
                             ✊ Камень-Ножницы-Бумага ✌️
                         </h1>
-                        <div className={styles.userInfo}>
+                        {/* <div className={styles.userInfo}>
                             <span>👤 {username}</span>
                             <button onClick={handleLogout} className={styles.logoutBtn}>
                                 Выйти
                             </button>
-                        </div>
+                        </div> */}
                     </div>
                     <p className={styles.subtitle}>
                         Покажите жест в камеру и победите компьютер!
