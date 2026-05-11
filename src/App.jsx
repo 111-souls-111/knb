@@ -5,11 +5,9 @@ import { GameProvider } from '../src/Context/gamecontext';
 import Login from './Components/auth/Login';
 import Register from './Components/auth/Register';
 import { authService } from './services/authservice';
-import SimpleRating from './Components/Rating/SimpleRating';
-
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [username, setUsername] = useState('');
+   const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [username, setUsername] = useState(null);
     const [showRegister, setShowRegister] = useState(false);
     const [isChecking, setIsChecking] = useState(true);
 
@@ -54,30 +52,19 @@ function App() {
             />
         );
     }
-
-    return (
-        <GameProvider>
-            <div className={styles.app}>
-                <header className={styles.header}>
-                    <div className={styles.headerContent}>
-                        <h1 className={styles.title}>
-                            ✊ Камень-Ножницы-Бумага ✌️
-                        </h1>
-                        <div className={styles.userInfo}>
-                            <SimpleRating username={username} />
-                            <span>👤 {username}</span>
-                            <button onClick={handleLogout} className={styles.logoutBtn}>
-                                Выйти
-                            </button>
-                        </div>
-                    </div>
-                    <p className={styles.subtitle}>
-                        Покажите жест в камеру и победите!
-                    </p>
-                </header>
-                
-                <main className={styles.main}>
-                    <CameraView username={username} />
+  return (
+       <GameProvider>
+ <div className={styles.app}>
+      <header className={styles.header}>
+        <h1 className={styles.title}>
+          ✊ Камень-Ножницы-Бумага ✌️
+        </h1>
+        <p className={styles.subtitle}>
+          Покажите жест в камеру!
+        </p>
+      </header>
+                      <main className={styles.main}>
+                    <CameraView />
                 </main>
                 
                 <footer className={styles.footer}>

@@ -1,3 +1,5 @@
+/* Основной контейнер */
+
 .gameArea {
     display: flex;
     flex-direction: column;
@@ -9,37 +11,27 @@
     box-sizing: border-box;
 }
 
+
+/* Счет */
+
 .scoreBoard {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 40px;
-    width: 100%;
+    gap: 30px;
+    background: white;
+    border-radius: 20px;
+    padding: 20px 40px;
 }
 
 .scoreCard {
     text-align: center;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 20px 30px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    width: 110px;
-    max-height: 110px;
-    transition: transform 0.3s ease;
-}
-
-.scoreCard:hover {
-    transform: translateY(-5px);
+    min-width: 100px;
 }
 
 .scoreLabel {
-    font-size: 10px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
 }
 
 .scoreValue {
@@ -50,7 +42,7 @@
 }
 
 .scoreDivider {
-    font-size: 30px;
+    font-size: 32px;
     font-weight: bold;
     color: white;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -84,16 +76,15 @@
 }
 
 .gestureLabel {
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 14px;
     color: #666;
     margin-bottom: 15px;
     text-transform: uppercase;
 }
 
 .gestureEmoji {
-    font-size: 40px;
-    filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2));
+    font-size: 80px;
+    margin-bottom: 15px;
 }
 
 .gestureName {
@@ -150,13 +141,7 @@
 /* Результат раунда */
 
 .roundResult {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 20px 20px;
-    border-radius: 50px;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: bold;
     text-align: center;
     animation: slideUp 0.5s ease;
@@ -187,11 +172,6 @@
 
 .waitingScreen,
 .gameOverScreen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 20vh;
     text-align: center;
     padding: 20px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -244,217 +224,12 @@
 
 .startBtn:hover,
 .playAgainBtn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
 }
 
-.startBtn:active,
-.playAgainBtn:active {
-    transform: translateY(0);
-}
-
-
-/* Адаптив для мобильных устройств */
-
-@media (max-width: 768px) {
-    .gameArea {
-        padding: 10px;
-    }
-    .scoreBoard {
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-    .scoreCard {
-        padding: 12px 20px;
-        min-width: 100px;
-    }
-    .scoreLabel {
-        font-size: 12px;
-    }
-    .scoreValue {
-        font-size: 32px;
-    }
-    .scoreDivider {
-        font-size: 32px;
-    }
-    .gesturesContainer {
-        gap: 15px;
-        margin-bottom: 30px;
-    }
-    .gestureBox {
-        padding: 15px;
-        min-width: 140px;
-    }
-    .gestureEmoji {
-        font-size: 60px;
-        margin: 10px 0;
-    }
-    .gestureName {
-        font-size: 14px;
-    }
-    .vsText {
-        font-size: 20px;
-        padding: 8px 15px;
-    }
-    .countdownNumber {
-        font-size: 80px;
-        padding: 20px 35px;
-    }
-    .countdownText {
-        font-size: 18px;
-    }
-    .roundResult {
-        font-size: 18px;
-        padding: 12px 24px;
-        bottom: 20px;
-        white-space: nowrap;
-    }
-    .waitingScreen h2,
-    .gameOverScreen h2 {
-        font-size: 28px;
-    }
-    .waitingScreen p {
-        font-size: 18px;
-    }
-    .waitingScreen {
-        height: 200px;
-    }
-    .finalScore {
-        font-size: 24px;
-        padding: 15px 30px;
-    }
-    .startBtn,
-    .playAgainBtn {
-        padding: 12px 30px;
-        font-size: 18px;
-    }
-}
-
-
-/* Адаптив для очень маленьких экранов */
-
-@media (max-width: 480px) {
-    .scoreCard {
-        min-width: 80px;
-        padding: 10px 15px;
-    }
-    .scoreValue {
-        font-size: 24px;
-    }
-    .gestureBox {
-        min-width: 100px;
-        padding: 12px;
-    }
-    .gestureEmoji {
-        font-size: 45px;
-    }
-    .gestureName {
-        font-size: 12px;
-    }
-    .vsText {
-        font-size: 16px;
-        padding: 6px 12px;
-    }
-    .countdownNumber {
-        font-size: 60px;
-        padding: 15px 25px;
-    }
-    .roundResult {
-        font-size: 14px;
-        padding: 8px 16px;
-        white-space: normal;
-        text-align: center;
-        max-width: 90%;
-    }
-    .waitingScreen h2,
-    .gameOverScreen h2 {
-        font-size: 24px;
-    }
-    .finalScore {
-        font-size: 20px;
-        padding: 12px 24px;
-    }
-}
-
-
-/* Адаптив для планшетов */
-
-@media (min-width: 769px) and (max-width: 1024px) {
-    .gestureEmoji {
-        font-size: 80px;
-    }
-    .countdownNumber {
-        font-size: 100px;
-    }
-}
-
-
-/* Адаптив для альбомной ориентации на мобильных */
-
-@media (max-width: 768px) and (orientation: landscape) {
-    .gameArea {
-        min-height: auto;
-        padding: 10px;
-    }
-    .gesturesContainer {
-        margin-bottom: 20px;
-    }
-    .gestureBox {
-        padding: 10px;
-    }
-    .gestureEmoji {
-        font-size: 40px;
-        margin: 5px 0;
-    }
-    .countdownNumber {
-        font-size: 60px;
-        padding: 15px 25px;
-    }
-}
-
-
-/* Анимации */
-
-@keyframes pulse {
-    0%,
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.05);
-    }
-}
-
-@keyframes bounce {
-    0% {
-        transform: scale(0.8);
-        opacity: 0;
-    }
-    50% {
-        transform: scale(1.2);
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateX(-50%) translateY(100px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(-50%) translateY(0);
-        opacity: 1;
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+.finalScore {
+    font-size: 24px;
+    margin: 20px 0;
+    color: #333;
+    font-weight: bold;
 }
