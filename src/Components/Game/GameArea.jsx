@@ -3,6 +3,8 @@ import { useGame } from '../../Context/gamecontext';
 import { useHandGesture } from '../../Hooks/UseHandGesture';
 import { ALL_GESTURES, GESTURE_DISPLAY, GAME_SETTINGS, ROUND_RESULTS } from '../../utils/gameconstant'
 import styles from './GameArea.module.css';
+import { ratingService } from '../../services/ratingservice';
+import { authService } from '../../services/authservice';
 
 const GameArea = ({ isCameraReady, webcamRef }) => {
     const {
@@ -47,13 +49,11 @@ const GameArea = ({ isCameraReady, webcamRef }) => {
     useEffect(() => {
         if (gameStatus !== 'countdown') return;
         
-        // Запуск таймера
         if (countdown === null) {
             startCountdown();
             return;
         }
         
-        // Таймер дошел до 0 - завершаем раунд
         if (countdown === 0) {
             const playerChoice = detectedGesture || ALL_GESTURES[0];
             const computerChoice = ALL_GESTURES[Math.floor(Math.random() * 3)];
@@ -63,7 +63,6 @@ const GameArea = ({ isCameraReady, webcamRef }) => {
             return;
         }
         
-        // Уменьшаем таймер каждую секунду
         const timer = setTimeout(() => {
             updateCountdown(countdown - 1);
         }, 1000);
@@ -82,6 +81,27 @@ const GameArea = ({ isCameraReady, webcamRef }) => {
             return () => clearTimeout(timer);
         }
     }, [gameStatus, winner, nextRound]);
+
+    // 4. ОБНОВЛЕНИЕ РЕЙТИНГА ПРИ ПОБЕДЕ
+    useEffect(() => {
+        const updateRating = async () => {
+            if (gameStatus === 'gameOver' && winner === true) {
+                const username = authService.getUsername();
+                if (username) {
+                    console.log('🏆 Победа! Обновляем рейтинг для:', username);
+                    const result = await ratingService.updateRating(username);
+                    if (result.success) {
+                        console.log('✅ Рейтинг обновлен! Всего побед:', result.wins);
+                        window.dispatchEvent(new CustomEvent('rating-updated', { 
+                            detail: { wins: result.wins }
+                        }));
+                    }
+                }
+            }
+        };
+        
+        updateRating();
+    }, [gameStatus, winner]);
 
     // Получение текста результата
     const getResultText = () => {
@@ -105,10 +125,10 @@ const GameArea = ({ isCameraReady, webcamRef }) => {
     }
 
     // Экран окончания игры
-    if ((gameStatus === 'gameOver')) {
+    if (gameStatus === 'gameOver') {
         return (
             <div className={styles.gameOverScreen}>
-                <h2>{getResultText}</h2>
+                <h2>{winner === true ? '🏆 ПОБЕДА! 🏆' : '💔 ПОРАЖЕНИЕ! 💔'}</h2>
                 <div className={styles.finalScore}>Счет: {playerScore} : {computerScore}</div>
                 <button onClick={resetGame} className={styles.playAgainBtn}>
                     Играть снова
@@ -120,7 +140,6 @@ const GameArea = ({ isCameraReady, webcamRef }) => {
     // Основной экран игры
     return (
         <div className={styles.gameArea}>
-            {/* Счет */}
             <div className={styles.scoreBoard}>
                 <div className={styles.scoreCard}>
                     <div className={styles.scoreLabel}>👤 ИГРОК</div>
@@ -133,7 +152,6 @@ const GameArea = ({ isCameraReady, webcamRef }) => {
                 </div>
             </div>
 
-            {/* Жесты */}
             <div className={styles.gesturesContainer}>
                 <div className={styles.gestureBox}>
                     <div className={styles.gestureLabel}>Ваш жест</div>
@@ -158,7 +176,6 @@ const GameArea = ({ isCameraReady, webcamRef }) => {
                 </div>
             </div>
 
-            {/* Таймер */}
             {gameStatus === 'countdown' && countdown > 0 && (
                 <div className={styles.countdown}>
                     <div className={styles.countdownNumber}>{countdown}</div>
@@ -166,7 +183,6 @@ const GameArea = ({ isCameraReady, webcamRef }) => {
                 </div>
             )}
 
-            {/* Результат раунда */}
             {gameStatus === 'roundEnd' && roundResult && (
                 <div className={`${styles.roundResult} ${styles[roundResult]}`}>
                     {getResultText()}

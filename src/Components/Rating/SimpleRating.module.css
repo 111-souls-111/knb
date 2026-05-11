@@ -1,0 +1,8 @@
+.simpleRating {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: white;
+    white-space: nowrap;
+}

@@ -1,22 +1,49 @@
-.cameraContainer {
+/* Двухколоночный контейнер */
+
+.twoColumnsContainer {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.leftColumn {
+    flex: 1.2;
+    min-width: 300px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
+    gap: 1rem;
+}
+
+.rightColumn {
+    flex: 0.8;
+    min-width: 300px;
+}
+
+
+/* Видео контейнер */
+
+.cameraContainer {
+    width: 100%;
 }
 
 .videoWrapper {
     position: relative;
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     background: #1a1a2e;
+    width: 100%;
 }
 
 .video {
+    width: 100%;
+    height: auto;
+    display: block;
     transform: scaleX(-1);
 }
+
+
+/* Прелоадер */
 
 .overlay {
     position: absolute;
@@ -31,7 +58,7 @@
     align-items: center;
     gap: 16px;
     color: white;
-    border-radius: 16px;
+    border-radius: 20px;
 }
 
 .loader {
@@ -52,6 +79,9 @@
     }
 }
 
+
+/* Ошибка */
+
 .errorOverlay {
     position: absolute;
     top: 0;
@@ -67,6 +97,7 @@
     color: white;
     text-align: center;
     padding: 20px;
+    border-radius: 20px;
 }
 
 .retryButton {
@@ -78,32 +109,47 @@
     cursor: pointer;
     font-size: 16px;
     font-weight: bold;
+    transition: transform 0.2s;
 }
+
+.retryButton:hover {
+    transform: scale(1.05);
+}
+
+
+/* Карточка жеста */
 
 .gestureCard {
     background: white;
     border-radius: 20px;
-    padding: 20px 40px;
+    padding: 20px;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    min-width: 200px;
 }
 
 .gestureEmoji {
-    font-size: 64px;
-    margin-bottom: 10px;
+    font-size: 48px;
+    margin-bottom: 8px;
 }
 
 .gestureText {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: bold;
     color: #333;
 }
 
+
+/* Статус */
+
 .statusContainer {
     display: flex;
     gap: 20px;
+    justify-content: center;
     font-size: 14px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 40px;
+    backdrop-filter: blur(4px);
 }
 
 .statusOk {
@@ -114,4 +160,49 @@
 .statusWait {
     color: #ffc107;
     font-weight: 500;
+}
+
+
+/* Адаптив для планшетов и телефонов */
+
+@media (max-width: 768px) {
+    .twoColumnsContainer {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    .leftColumn,
+    .rightColumn {
+        flex: auto;
+        width: 100%;
+    }
+    .gestureEmoji {
+        font-size: 36px;
+    }
+    .gestureText {
+        font-size: 16px;
+    }
+    .statusContainer {
+        font-size: 12px;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gestureCard {
+        padding: 12px;
+    }
+    .gestureEmoji {
+        font-size: 28px;
+    }
+    .gestureText {
+        font-size: 14px;
+    }
+    .statusContainer {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .loader {
+        width: 40px;
+        height: 40px;
+    }
 }
