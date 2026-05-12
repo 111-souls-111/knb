@@ -128,7 +128,9 @@ const GameArea = ({ isCameraReady, webcamRef }) => {
     if (gameStatus === 'gameOver') {
         return (
             <div className={styles.gameOverScreen}>
-                <h2>{winner === true ? '🏆 ПОБЕДА! 🏆' : '💔 ПОРАЖЕНИЕ! 💔'}</h2>
+
+                <h2>{!winner?'Поражение':'победа'}</h2>
+
                 <div className={styles.finalScore}>Счет: {playerScore} : {computerScore}</div>
                 <button onClick={resetGame} className={styles.playAgainBtn}>
                     Играть снова

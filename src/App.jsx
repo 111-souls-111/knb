@@ -9,6 +9,7 @@ import { authService } from './services/authservice';
 import SimpleRating from './Components/Rating/SimpleRating';
 
 function App() {
+
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [username, setUsername] = useState('');
 
@@ -23,16 +24,19 @@ function App() {
         setIsChecking(false);
     }, []);
 
+
     const handleLoginSuccess = (user) => {
         setUsername(user.username);
         setIsAuthenticated(true);
     };
+
 
     const handleLogout = () => {
         authService.logout();
         setUsername('');
         setIsAuthenticated(false);
     };
+
 
     if (isChecking) {
         return (
@@ -65,9 +69,13 @@ function App() {
                         <h1 className={styles.title}>
                             ✊ Камень-Ножницы-Бумага ✌️
                         </h1>
-                        <div className={styles.userInfo}>
+
+                      
 
                             <SimpleRating username={username} />
+
+
+                        <div className={styles.userInfo}>
 
                             <span>👤 {username}</span>
                             <button onClick={handleLogout} className={styles.logoutBtn}>

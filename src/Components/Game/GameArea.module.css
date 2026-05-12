@@ -1,5 +1,3 @@
-/* Основной контейнер */
-
 .gameArea {
     display: flex;
     flex-direction: column;
@@ -11,17 +9,12 @@
     box-sizing: border-box;
 }
 
-
-/* Счет */
-
 .scoreBoard {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
     margin-bottom: 40px;
-    margin-bottom: 40px;
-    flex-wrap: wrap;
     width: 100%;
 }
 
@@ -33,9 +26,6 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     width: 110px;
     max-height: 110px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    min-width: 150px;
     transition: transform 0.3s ease;
 }
 
@@ -95,7 +85,6 @@
 
 .gestureLabel {
     font-size: 10px;
-    font-size: 16px;
     font-weight: 600;
     color: #666;
     margin-bottom: 15px;
@@ -328,10 +317,10 @@
     .waitingScreen p {
         font-size: 18px;
     }
-    <<<<<<< HEAD .waitingScreen {
+    .waitingScreen {
         height: 200px;
     }
-    =======>>>>>>>a6a9db587cbb4f77a1aef9ae31dc38c925f060fd .finalScore {
+    .finalScore {
         font-size: 24px;
         padding: 15px 30px;
     }
