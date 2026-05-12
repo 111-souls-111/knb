@@ -5,14 +5,13 @@ import { GameProvider } from '../src/Context/gamecontext';
 import Login from './Components/auth/Login';
 import Register from './Components/auth/Register';
 import { authService } from './services/authservice';
-
 import SimpleRating from './Components/Rating/SimpleRating';
+import OnlineGame from './Components/Online/OnlineGame'; // ДОБАВИТЬ импорт
 
 function App() {
-
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [username, setUsername] = useState('');
-
+    const [gameMode, setGameMode] = useState('single');
     const [showRegister, setShowRegister] = useState(false);
     const [isChecking, setIsChecking] = useState(true);
 
@@ -24,19 +23,16 @@ function App() {
         setIsChecking(false);
     }, []);
 
-
     const handleLoginSuccess = (user) => {
         setUsername(user.username);
         setIsAuthenticated(true);
     };
-
 
     const handleLogout = () => {
         authService.logout();
         setUsername('');
         setIsAuthenticated(false);
     };
-
 
     if (isChecking) {
         return (
@@ -70,31 +66,44 @@ function App() {
                             ✊ Камень-Ножницы-Бумага ✌️
                         </h1>
 
-                      
-
-                            <SimpleRating username={username} />
-
-
                         <div className={styles.userInfo}>
-
+                            <SimpleRating username={username} />
                             <span>👤 {username}</span>
                             <button onClick={handleLogout} className={styles.logoutBtn}>
                                 Выйти
                             </button>
                         </div>
                     </div>
+                    
+                    {/* ДОБАВИТЬ КНОПКИ ПЕРЕКЛЮЧЕНИЯ РЕЖИМОВ */}
+                    <div className={styles.gameModeSwitch}>
+                        <button 
+                            className={`${styles.modeBtn} ${gameMode === 'single' ? styles.activeMode : ''}`}
+                            onClick={() => setGameMode('single')}
+                        >
+                            🎮 Одиночная игра
+                        </button>
+                        <button 
+                            className={`${styles.modeBtn} ${gameMode === 'online' ? styles.activeMode : ''}`}
+                            onClick={() => setGameMode('online')}
+                        >
+                            🌐 Онлайн режим
+                        </button>
+                    </div>
+                    
                     <p className={styles.subtitle}>
-
-                        Покажите жест в камеру и победите!
-
-
+                        {gameMode === 'single' 
+                            ? 'Покажите жест в камеру и победите!'
+                            : 'Сразитесь с реальным соперником!'}
                     </p>
                 </header>
                 
                 <main className={styles.main}>
-
-                    <CameraView username={username} />
-
+                    {gameMode === 'single' ? (
+                        <CameraView />
+                    ) : (
+                        <OnlineGame />
+                    )}
                 </main>
                 
                 <footer className={styles.footer}>
