@@ -7,7 +7,11 @@ const SimpleRating = ({ username }) => {
 
     const loadStats = async () => {
         if (!username) return;
+        
+        console.log('📊 Загрузка рейтинга для:', username);
         const result = await ratingService.getUserRating(username);
+        console.log('📊 Побед:', result.wins);
+        
         if (result.success) {
             setWins(result.wins);
         }
@@ -19,8 +23,13 @@ const SimpleRating = ({ username }) => {
 
     // Слушаем событие обновления рейтинга
     useEffect(() => {
-        window.addEventListener('rating-updated', loadStats);
-        return () => window.removeEventListener('rating-updated', loadStats);
+        const handleRatingUpdate = (event) => {
+            console.log('🔄 Получено событие обновления рейтинга:', event.detail);
+            loadStats(); // Просто перезагружаем статистику
+        };
+        
+        window.addEventListener('rating-updated', handleRatingUpdate);
+        return () => window.removeEventListener('rating-updated', handleRatingUpdate);
     }, [username]);
 
     return (
