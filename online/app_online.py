@@ -1,17 +1,24 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit, join_room
 import sqlite3
 import hashlib
 import uuid
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-CORS(app)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'secret!')
+
+CORS(app, origins=[
+    "https://knb-mmelnikov750-qyxa.onreza.app",
+    "https://*.onreza.app",
+    "http://localhost:3000"
+])
+
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# База данных
-DATABASE = "users.db"
+# База данных - используем /data для постоянного хранения
+DATABASE = "/data/users.db" if "AMVERA" in os.environ else "users.db"
 
 def init_db():
     conn = sqlite3.connect(DATABASE)
@@ -32,13 +39,13 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
-    print("База данных готова")
+    print(f"База данных готова: {DATABASE}")
 
 def get_db():
     return sqlite3.connect(DATABASE)
 
-# Хранилище игр
-games = {}  # room_id: {players: [], gestures: {}, scores: {}, status: 'waiting/playing'}
+# Хранилище игр (в памяти)
+games = {}
 
 @app.route("/")
 def hello():
@@ -109,22 +116,53 @@ def get_rating(username):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/rating/update", methods=["POST"])
+def update_rating():
+    try:
+        data = request.get_json()
+        username = data.get("username")
+        
+        conn = get_db()
+        c = conn.cursor()
+        c.execute('SELECT wins FROM ratings WHERE username = ?', (username,))
+        result = c.fetchone()
+        
+        if result:
+            new_wins = result[0] + 1
+            c.execute('UPDATE ratings SET wins = ? WHERE username = ?', (new_wins, username))
+        else:
+            new_wins = 1
+            c.execute('INSERT INTO ratings (username, wins) VALUES (?, ?)', (username, new_wins))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({"wins": new_wins}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 # ========== WebSocket для онлайн игры ==========
+
+@socketio.on('connect')
+def handle_connect():
+    print("✅ Клиент подключился")
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print("❌ Клиент отключился")
 
 @socketio.on('find_game')
 def find_game(data):
     username = data.get('username')
     print(f"🔍 {username} ищет игру")
     
-    # Ищем ожидающую игру
     waiting_room = None
     for room_id, game in games.items():
-        if game['status'] == 'waiting' and len(game['players']) == 1:
+        if game.get('status') == 'waiting' and len(game.get('players', [])) == 1:
             waiting_room = room_id
             break
     
     if waiting_room:
-        # Присоединяемся к существующей игре
         join_room(waiting_room)
         games[waiting_room]['players'].append(username)
         games[waiting_room]['status'] = 'playing'
@@ -132,15 +170,12 @@ def find_game(data):
         games[waiting_room]['gestures'] = {}
         
         print(f"✅ Игра создана! Комната: {waiting_room}")
-        print(f"👥 Игроки: {games[waiting_room]['players']}")
         
-        # Отправляем обоим игрокам что игра началась
         emit('game_start', {
             'players': games[waiting_room]['players'],
             'room': waiting_room
         }, room=waiting_room)
     else:
-        # Создаем новую игру
         room_id = str(uuid.uuid4())[:8]
         join_room(room_id)
         games[room_id] = {
@@ -149,7 +184,7 @@ def find_game(data):
             'scores': {},
             'gestures': {}
         }
-        print(f"🆕 Создана новая комната: {room_id}, ожидание игрока...")
+        print(f"🆕 Создана новая комната: {room_id}")
         emit('waiting_for_player', {'room': room_id})
 
 @socketio.on('make_gesture')
@@ -162,18 +197,16 @@ def make_gesture(data):
         return
     
     games[room]['gestures'][username] = gesture
-    print(f"✋ {username} показал {gesture} в комнате {room}")
+    print(f"✋ {username} показал {gesture}")
     
-    # Если оба игрока сделали жест
     if len(games[room]['gestures']) == 2:
         players = games[room]['players']
         p1, p2 = players[0], players[1]
         g1, g2 = games[room]['gestures'][p1], games[room]['gestures'][p2]
         
-        # Определяем победителя
-        winner = None
         if g1 == g2:
             result = 'draw'
+            winner = None
         elif (g1 == 'rock' and g2 == 'scissors') or \
              (g1 == 'scissors' and g2 == 'paper') or \
              (g1 == 'paper' and g2 == 'rock'):
@@ -185,49 +218,41 @@ def make_gesture(data):
             winner = p2
             games[room]['scores'][p2] += 1
         
-        # Проверяем победу в игре (до 3 побед)
         game_winner = None
         if games[room]['scores'][p1] >= 3:
             game_winner = p1
+            update_winner_rating(p1)
         elif games[room]['scores'][p2] >= 3:
             game_winner = p2
+            update_winner_rating(p2)
         
-        # Отправляем результат
         emit('round_result', {
-            'p1': p1,
-            'p2': p2,
-            'g1': g1,
-            'g2': g2,
+            'p1': p1, 'p2': p2,
+            'g1': g1, 'g2': g2,
             'result': result,
             'winner': winner,
             'scores': games[room]['scores'],
             'game_winner': game_winner
         }, room=room)
         
-        # Очищаем жесты для следующего раунда
         games[room]['gestures'] = {}
         
-        # Если игра окончена
         if game_winner:
-            # Обновляем рейтинг победителя
-            conn = get_db()
-            c = conn.cursor()
-            c.execute('SELECT wins FROM ratings WHERE username = ?', (game_winner,))
-            result = c.fetchone()
-            if result:
-                c.execute('UPDATE ratings SET wins = ? WHERE username = ?', (result[0] + 1, game_winner))
-            else:
-                c.execute('INSERT INTO ratings (username, wins) VALUES (?, ?)', (game_winner, 1))
-            conn.commit()
-            conn.close()
-            
-            # Удаляем игру
             del games[room]
 
-@socketio.on('disconnect')
-def handle_disconnect():
-    print(f"❌ Клиент отключился")
+def update_winner_rating(username):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute('SELECT wins FROM ratings WHERE username = ?', (username,))
+    result = c.fetchone()
+    if result:
+        c.execute('UPDATE ratings SET wins = ? WHERE username = ?', (result[0] + 1, username))
+    else:
+        c.execute('INSERT INTO ratings (username, wins) VALUES (?, ?)', (username, 1))
+    conn.commit()
+    conn.close()
 
 if __name__ == "__main__":
     init_db()
-    socketio.run(app, host='0.0.0.0', port=5001, debug=True)
+    port = int(os.environ.get('PORT', 8080))
+    socketio.run(app, host='0.0.0.0', port=port)

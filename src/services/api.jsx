@@ -1,10 +1,13 @@
 import axios from 'axios';
+import { io } from 'socket.io-client';
 
-// URL вашего Flask сервера
-// const BASE_URL = 'https://knb-master-maxim12341234.amvera.io/';
-const BASE_URL = 'http://127.0.0.1:5000'
+// URL сервера авторизации (уже есть)
+const BASE_URL = 'https://knb-master-maxim12341234.amvera.io/';
+// const BASE_URL = 'http://127.0.0.1:5000'
 
-
+// URL сервера онлайн игры (замените после деплоя)
+const ONLINE_URL ='https://knb-online.amvera.io'  
+    // : 'http://127.0.0.1:5001';
 
 const api = axios.create({
     baseURL: BASE_URL,
@@ -14,7 +17,16 @@ const api = axios.create({
     }
 });
 
-// Добавляем логирование
+// Функция для создания WebSocket соединения
+const createSocket = () => {
+    const socket = io(ONLINE_URL, {
+        transports: ['websocket', 'polling'],
+        reconnection: true
+    });
+    return socket;
+};
+
+// Логирование
 api.interceptors.request.use(
     (config) => {
         console.log(`📤 ${config.method.toUpperCase()} ${config.url}`, config.data);
@@ -29,9 +41,12 @@ api.interceptors.response.use(
         return response;
     },
     (error) => {
-        console.error('❌ Ошибка:', error.response ?.data || error.message);
+        console.error('❌ Ошибка:', error.response?.data || error.message);
         return Promise.reject(error);
     }
 );
 
 export default api;
+export { createSocket, ONLINE_URL };
+
+// const BASE_URL = 'http://127.0.0.1:5000'

@@ -6,12 +6,12 @@ import hashlib
 
 app = Flask(__name__)
 
-CORS(app) 
+# CORS(app) 
 
-# CORS(app, origins=[
-#     "https://knb-mmelnikov750-qyxa.onreza.app",
-#     "https://knb-master.amvera.io"
-# ])
+CORS(app, origins=[
+    "https://knb-mmelnikov750-qyxa.onreza.app",
+    "https://knb-master.amvera.io"
+])
 
 # База данных
 DATABASE = "users.db"

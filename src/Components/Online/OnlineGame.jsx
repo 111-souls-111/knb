@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import io from 'socket.io-client';
 import Webcam from 'react-webcam';
 import { useHandGesture } from '../../Hooks/UseHandGesture';
 import { authService } from '../../services/authservice';
+import { createSocket, ONLINE_URL } from '../../services/api';
 import styles from './OnlineGame.module.css';
 
 const OnlineGame = () => {
@@ -22,11 +22,11 @@ const OnlineGame = () => {
         const username = authService.getUsername();
         if (!username) return;
 
-        const newSocket = io('http://127.0.0.1:5001');
+        const newSocket = createSocket();
         setSocket(newSocket);
 
         newSocket.on('connect', () => {
-            console.log('Соединение установлено');
+            console.log('✅ Connected to:', ONLINE_URL);
             newSocket.emit('find_game', { username });
         });
 
@@ -56,19 +56,14 @@ const OnlineGame = () => {
 
             const currentUsername = authService.getUsername();
 
-            // Если игра окончена
             if (data.game_winner) {
-                // Если победитель - текущий игрок, обновляем рейтинг
                 if (data.game_winner === currentUsername) {
-                    console.log('🏆 ПОБЕДА! Обновляем рейтинг...');
-                    // Отправляем событие для обновления счетчика
                     window.dispatchEvent(new CustomEvent('rating-updated'));
                 }
-                
                 setGameState('gameOver');
                 setTimeout(() => {
                     setGameState('searching');
-                    newSocket.emit('find_game', { currentUsername });
+                    newSocket.emit('find_game', { username: currentUsername });
                 }, 3000);
             } else {
                 setTimeout(() => {
@@ -96,7 +91,6 @@ const OnlineGame = () => {
         }, 1000);
     };
 
-    // Распознавание жеста через камеру
     useEffect(() => {
         if (gameState !== 'playing' || countdown !== null) return;
         
@@ -119,11 +113,7 @@ const OnlineGame = () => {
     }, [gameState, countdown, socket, room, analyzeGesture, detectedGesture]);
 
     const getGestureEmoji = (gesture) => {
-        const emojis = {
-            rock: '👊',
-            paper: '✋',
-            scissors: '✌️'
-        };
+        const emojis = { rock: '👊', paper: '✋', scissors: '✌️' };
         return emojis[gesture] || '❓';
     };
 
@@ -134,16 +124,11 @@ const OnlineGame = () => {
         return (
             <div className={styles.onlineContainer}>
                 <div className={styles.searchingCard}>
-                    <Webcam
-                        ref={webcamRef}
-                        audio={false}
-                        className={styles.hiddenWebcam}
-                        style={{ display: 'none' }}
-                    />
+                    <Webcam ref={webcamRef} audio={false} style={{ display: 'none' }} />
                     <div className={styles.loader}></div>
                     <h2>{gameState === 'searching' ? 'Поиск соперника...' : 'Ожидание соперника...'}</h2>
                     <p>🎮 Подготовьте камеру!</p>
-                    {isModelLoading && <p>🔄 Загрузка модели распознавания...</p>}
+                    {isModelLoading && <p>🔄 Загрузка модели...</p>}
                 </div>
             </div>
         );
@@ -166,28 +151,19 @@ const OnlineGame = () => {
 
     return (
         <div className={styles.onlineContainer}>
-            <Webcam
-                ref={webcamRef}
-                audio={false}
-                className={styles.webcam}
-                mirrored={true}
-            />
+            <Webcam ref={webcamRef} audio={false} className={styles.webcam} mirrored={true} />
             
             <div className={styles.gameHeader}>
                 <div className={styles.playerCard}>
                     <div className={styles.playerName}>👤 {username}</div>
                     <div className={styles.playerScore}>{scores[username] || 0}</div>
-                    <div className={styles.gesture}>
-                        {detectedGesture && getGestureEmoji(detectedGesture)}
-                    </div>
+                    <div className={styles.gesture}>{detectedGesture && getGestureEmoji(detectedGesture)}</div>
                 </div>
                 <div className={styles.vs}>VS</div>
                 <div className={styles.playerCard}>
                     <div className={styles.playerName}>👾 {opponent || 'Соперник'}</div>
                     <div className={styles.playerScore}>{scores[opponent] || 0}</div>
-                    <div className={styles.gesture}>
-                        {lastGestures[opponent] && getGestureEmoji(lastGestures[opponent])}
-                    </div>
+                    <div className={styles.gesture}>{lastGestures[opponent] && getGestureEmoji(lastGestures[opponent])}</div>
                 </div>
             </div>
 
@@ -201,8 +177,7 @@ const OnlineGame = () => {
             {roundResult && (
                 <div className={`${styles.roundResult} ${styles[roundResult.result]}`}>
                     {roundResult.winner === username ? '🎉 Вы выиграли раунд!' : 
-                     roundResult.result === 'draw' ? '🤝 Ничья!' : 
-                     '💔 Вы проиграли раунд!'}
+                     roundResult.result === 'draw' ? '🤝 Ничья!' : '💔 Вы проиграли раунд!'}
                 </div>
             )}
         </div>
