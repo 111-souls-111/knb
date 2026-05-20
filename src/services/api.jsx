@@ -6,7 +6,7 @@ const BASE_URL = 'https://knb-master-maxim12341234.amvera.io/';
 // const BASE_URL = 'http://127.0.0.1:5000'
 
 // URL сервера онлайн игры (замените после деплоя)
-const ONLINE_URL ='https://knb-online.amvera.io'  
+const ONLINE_URL ='https://knb-socket-maxim12341234.amvera.io/'  
     // : 'http://127.0.0.1:5001';
 
 const api = axios.create({
