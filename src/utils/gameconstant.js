@@ -25,7 +25,7 @@ export const WIN_RULES = {
 // Настройки игры
 export const GAME_SETTINGS = {
     SCORE_TO_WIN: 3,
-    ROUND_DELAY: 4000,
+    ROUND_DELAY: 500,
     COUNTDOWN_START: 3
 };
 
