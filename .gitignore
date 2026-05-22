@@ -21,7 +21,10 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+<<<<<<< HEAD
 
+=======
+>>>>>>> local
 # Python
 venv/
 __pycache__/
@@ -60,4 +63,32 @@ yarn-error.log*
 # Build
 build/
 dist/
+<<<<<<< HEAD
 .DS_Store
+=======
+.DS_Store
+# Python
+venv/
+.venv/
+env/
+.env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+>>>>>>> local
