@@ -182,3 +182,85 @@
     padding: 20px 40px;
     border-radius: 50%;
 }
+
+
+/* Кнопки жестов */
+
+.gestureButtons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.gestureBtnRock {
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.gestureBtnScissors {
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    background: #4ecdc4;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+}
+
+.gestureBtnPaper {
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    background: #45b7d1;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(69, 183, 209, 0.3);
+}
+
+.gestureBtnRock:hover,
+.gestureBtnScissors:hover,
+.gestureBtnPaper:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.gestureSelected {
+    text-align: center;
+    background: rgba(76, 175, 80, 0.9);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 40px;
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+.gestureName {
+    font-size: 12px;
+    margin-left: 5px;
+    display: inline-block;
+}
+
+.gesture {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 10px;
+    font-size: 24px;
+}

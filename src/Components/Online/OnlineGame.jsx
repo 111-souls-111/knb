@@ -17,6 +17,7 @@ const OnlineGame = () => {
     const { analyzeGesture, isModelLoading } = useHandGesture();
     const [detectedGesture, setDetectedGesture] = useState(null);
     const [countdown, setCountdown] = useState(null);
+    const [manualGesture, setManualGesture] = useState(null); // Для кнопок
 
     useEffect(() => {
         const username = authService.getUsername();
@@ -40,6 +41,8 @@ const OnlineGame = () => {
             setPlayers(data.players);
             setRoom(data.room);
             setScores({});
+            setManualGesture(null);
+            setDetectedGesture(null);
             startCountdown();
         });
 
@@ -56,29 +59,44 @@ const OnlineGame = () => {
 
             const currentUsername = authService.getUsername();
 
-            // Если игра окончена
             if (data.game_winner) {
-                // Если победитель - текущий игрок, обновляем рейтинг
                 if (data.game_winner === currentUsername) {
                     console.log('🏆 ПОБЕДА! Обновляем рейтинг...');
-                    // Отправляем событие для обновления счетчика
                     window.dispatchEvent(new CustomEvent('rating-updated'));
                 }
-                
                 setGameState('gameOver');
                 setTimeout(() => {
                     setGameState('searching');
-                    newSocket.emit('find_game', { currentUsername });
+                    newSocket.emit('find_game', { username: currentUsername });
                 }, 3000);
             } else {
                 setTimeout(() => {
                     setRoundResult(null);
                     setLastGestures({});
                     setDetectedGesture(null);
+                    setManualGesture(null);
                     startCountdown();
                 }, 2000);
             }
         });
+        newSocket.on('player_disconnected', (data) => {
+    console.log('Соперник покинул игру:', data.message);
+    alert('Соперник покинул игру! Возвращаемся в лобби...');
+    
+    // Возвращаемся в состояние поиска
+    setGameState('searching');
+    setPlayers([]);
+    setScores({});
+    setRoundResult(null);
+    setLastGestures({});
+    setDetectedGesture(null);
+    setManualGesture(null);
+    
+    // Заново ищем игру
+    setTimeout(() => {
+        newSocket.emit('find_game', { username: authService.getUsername() });
+    }, 2000);
+});
 
         return () => newSocket.close();
     }, []);
@@ -96,27 +114,49 @@ const OnlineGame = () => {
         }, 1000);
     };
 
+    // Отправка жеста (общая функция)
+    const sendGesture = (gesture) => {
+        if (gameState !== 'playing' || countdown !== null) return;
+        if (socket && room) {
+            console.log('📤 Отправка жеста:', gesture);
+            socket.emit('make_gesture', {
+                room: room,
+                username: authService.getUsername(),
+                gesture: gesture
+            });
+        }
+    };
+
+    // Ручной выбор жеста (кнопки)
+    const handleManualGesture = (gesture) => {
+        if (gameState !== 'playing' || countdown !== null) return;
+        if (manualGesture) return; // Уже отправили
+        if (detectedGesture) return; // Уже отправили через камеру
+        
+        console.log('🖱️ Ручной выбор жеста:', gesture);
+        setManualGesture(gesture);
+        sendGesture(gesture);
+    };
+
     // Распознавание жеста через камеру
     useEffect(() => {
         if (gameState !== 'playing' || countdown !== null) return;
+        if (manualGesture) return; // Если уже выбрали кнопкой, не используем камеру
         
         const interval = setInterval(async () => {
             const video = webcamRef.current?.video;
             if (video && video.readyState === 4 && socket && room) {
                 const gesture = await analyzeGesture(video);
-                if (gesture !== 'none' && gesture !== detectedGesture) {
+                if (gesture !== 'none' && gesture !== detectedGesture && !manualGesture) {
+                    console.log('🎥 Камера распознала:', gesture);
                     setDetectedGesture(gesture);
-                    socket.emit('make_gesture', {
-                        room: room,
-                        username: authService.getUsername(),
-                        gesture: gesture
-                    });
+                    sendGesture(gesture);
                 }
             }
         }, 500);
         
         return () => clearInterval(interval);
-    }, [gameState, countdown, socket, room, analyzeGesture, detectedGesture]);
+    }, [gameState, countdown, socket, room, analyzeGesture, detectedGesture, manualGesture]);
 
     const getGestureEmoji = (gesture) => {
         const emojis = {
@@ -127,8 +167,18 @@ const OnlineGame = () => {
         return emojis[gesture] || '❓';
     };
 
+    const getGestureName = (gesture) => {
+        const names = {
+            rock: 'Камень',
+            paper: 'Бумага',
+            scissors: 'Ножницы'
+        };
+        return names[gesture] || '';
+    };
+
     const username = authService.getUsername();
     const opponent = players.find(p => p !== username);
+    const selectedGesture = manualGesture || detectedGesture;
 
     if (gameState === 'searching' || gameState === 'waiting') {
         return (
@@ -143,6 +193,7 @@ const OnlineGame = () => {
                     <div className={styles.loader}></div>
                     <h2>{gameState === 'searching' ? 'Поиск соперника...' : 'Ожидание соперника...'}</h2>
                     <p>🎮 Подготовьте камеру!</p>
+                    <p>💡 Можно также использовать кнопки во время игры</p>
                     {isModelLoading && <p>🔄 Загрузка модели распознавания...</p>}
                 </div>
             </div>
@@ -178,7 +229,13 @@ const OnlineGame = () => {
                     <div className={styles.playerName}>👤 {username}</div>
                     <div className={styles.playerScore}>{scores[username] || 0}</div>
                     <div className={styles.gesture}>
-                        {detectedGesture && getGestureEmoji(detectedGesture)}
+                        {selectedGesture && (
+                            <>
+                                {getGestureEmoji(selectedGesture)}
+                                <span className={styles.gestureName}>{getGestureName(selectedGesture)}</span>
+                            </>
+                        )}
+                        {!selectedGesture && '❓'}
                     </div>
                 </div>
                 <div className={styles.vs}>VS</div>
@@ -186,7 +243,13 @@ const OnlineGame = () => {
                     <div className={styles.playerName}>👾 {opponent || 'Соперник'}</div>
                     <div className={styles.playerScore}>{scores[opponent] || 0}</div>
                     <div className={styles.gesture}>
-                        {lastGestures[opponent] && getGestureEmoji(lastGestures[opponent])}
+                        {lastGestures[opponent] && (
+                            <>
+                                {getGestureEmoji(lastGestures[opponent])}
+                                <span className={styles.gestureName}>{getGestureName(lastGestures[opponent])}</span>
+                            </>
+                        )}
+                        {!lastGestures[opponent] && '❓'}
                     </div>
                 </div>
             </div>
@@ -194,7 +257,31 @@ const OnlineGame = () => {
             {countdown && (
                 <div className={styles.countdown}>
                     <div className={styles.countdownNumber}>{countdown}</div>
-                    <div>Покажите жест!</div>
+                    <div>Покажите жест или нажмите кнопку!</div>
+                </div>
+            )}
+
+            {/* Кнопки выбора жестов */}
+            {gameState === 'playing' && !selectedGesture && (
+                <div className={styles.gestureButtons}>
+                    <button onClick={() => handleManualGesture('rock')} className={styles.gestureBtnRock}>
+                        👊 Камень
+                    </button>
+                    <button onClick={() => handleManualGesture('scissors')} className={styles.gestureBtnScissors}>
+                        ✌️ Ножницы
+                    </button>
+                    <button onClick={() => handleManualGesture('paper')} className={styles.gestureBtnPaper}>
+                        ✋ Бумага
+                    </button>
+                </div>
+            )}
+
+            {/* Индикация выбранного жеста */}
+            {gameState === 'playing' && selectedGesture && (
+                <div className={styles.gestureSelected}>
+                    ✅ Вы выбрали: {getGestureName(selectedGesture)} {getGestureEmoji(selectedGesture)}
+                    <br />
+                    <small>Ожидаем соперника...</small>
                 </div>
             )}
 

@@ -39,6 +39,8 @@ def get_db():
 
 # Хранилище игр
 games = {}  # room_id: {players: [], gestures: {}, scores: {}, status: 'waiting/playing'}
+# Хранилище соответствия sid -> room
+user_rooms = {}
 
 @app.route("/")
 def hello():
@@ -116,6 +118,9 @@ def find_game(data):
     username = data.get('username')
     print(f"🔍 {username} ищет игру")
     
+    # Сохраняем связь sid -> username
+    user_rooms[request.sid] = {'username': username, 'room': None}
+    
     # Ищем ожидающую игру
     waiting_room = None
     for room_id, game in games.items():
@@ -130,6 +135,9 @@ def find_game(data):
         games[waiting_room]['status'] = 'playing'
         games[waiting_room]['scores'] = {username: 0, games[waiting_room]['players'][0]: 0}
         games[waiting_room]['gestures'] = {}
+        
+        # Сохраняем комнату для пользователя
+        user_rooms[request.sid]['room'] = waiting_room
         
         print(f"✅ Игра создана! Комната: {waiting_room}")
         print(f"👥 Игроки: {games[waiting_room]['players']}")
@@ -149,6 +157,7 @@ def find_game(data):
             'scores': {},
             'gestures': {}
         }
+        user_rooms[request.sid]['room'] = room_id
         print(f"🆕 Создана новая комната: {room_id}, ожидание игрока...")
         emit('waiting_for_player', {'room': room_id})
 
@@ -223,10 +232,43 @@ def make_gesture(data):
             
             # Удаляем игру
             del games[room]
+            
+            # Очищаем user_rooms для игроков
+            for sid, info in list(user_rooms.items()):
+                if info.get('room') == room:
+                    del user_rooms[sid]
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    print(f"❌ Клиент отключился")
+    print(f"❌ Клиент отключился: {request.sid}")
+    
+    # Находим комнату пользователя
+    user_info = user_rooms.get(request.sid)
+    if user_info:
+        room_id = user_info.get('room')
+        username = user_info.get('username')
+        
+        if room_id and room_id in games:
+            print(f"👋 Игрок {username} вышел из комнаты {room_id}")
+            
+            # Уведомляем другого игрока
+            emit('player_disconnected', {
+                'message': f'{username} покинул игру'
+            }, room=room_id)
+            
+            # Удаляем игру
+            del games[room_id]
+            
+            # Очищаем user_rooms для всех в этой комнате
+            for sid, info in list(user_rooms.items()):
+                if info.get('room') == room_id:
+                    del user_rooms[sid]
+        
+        # Очищаем запись
+        if request.sid in user_rooms:
+            del user_rooms[request.sid]
+    
+    print(f"📊 Активных игр: {len(games)}")
 
 if __name__ == "__main__":
     init_db()
