@@ -23,7 +23,7 @@ const OnlineGame = () => {
         const username = authService.getUsername();
         if (!username) return;
 
-        const newSocket = io('http://127.0.0.1:5001');
+        const newSocket = io('https://knb-socket-maxim12341234.amvera.io/');
         setSocket(newSocket);
 
         newSocket.on('connect', () => {
