@@ -1,70 +1,51 @@
-# Getting Started with Create React App
+# ✊✋✌️ Multiplayer RPS — Онлайн «Камень, ножницы, бумага» с распознаванием жестов
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Интерактивная многопользовательская игра, в которой пользователи показывают жесты **прямо перед веб-камерой**. Нейросеть распознает жест в реальном времени, а игра синхронизирует ходы двух игроков через WebSockets.
 
-## Available Scripts
+🌐 **[Ссылка на живое демо (Live Demo)]** *(если задеплоено)*
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 🛠 Стек технологий
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+*   **Core:** React 19, JavaScript / TypeScript *(выберите, что использовали)*
+*   **Computer Vision:** TensorFlow.js, `@tensorflow-models/handpose`
+*   **Webcam:** `react-webcam`
+*   **Real-time:** Socket.io-client (WebSockets)
+*   **Testing:** Jest, React Testing Library
+*   **Tooling:** Axios, Normalize.css
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## ✨ Ключевые возможности (Features)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+*   **Распознавание жестов (ML в браузере):** Интеграция модели `Handpose` от TensorFlow.js для трекинга кисти руки через веб-камеру без отправки видеопотока на сервер (приватность и низкая задержка).
+*   **Классификация фигур:** Написана логика анализа 21 ключевой точки кисти для определения жестов (камень, ножницы, бумага).
+*   **Real-time мультиплеер:** Синхронизация ходов двух игроков через Socket.io с обработкой состояний ожидания соперника.
+*   **Авторизация и регистрация:** Интерфейс входа для создания профиля игрока и сохранения статистики.
+*   **Покрытие тестами:** Написаны unit-тесты для игровой логики и UI-компонентов.
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🧠 Как работает распознавание жестов (Under the hood)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1.  Компонент `<Webcam />` захватывает видеопоток с камеры пользователя.
+2.  Видеопоток передается в модель `Handpose` из TensorFlow.js.
+3.  Модель возвращает массив из **21 координаты (landmarks)** для каждой обнаруженной руки.
+4.  Написанная скрипт-логика анализирует расстояния между пальцами и их положение:
+    *   Все пальцы сжаты в кулак -> **Камень (Rock)**
+    *   Разведены указательный и средний -> **Ножницы (Scissors)**
+    *   Разжаты все пять пальцев -> **Бумага (Paper)**
+5.  Распознанный жест отправляется через сокет на сервер, где определяется победитель раунда.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## 🚀 Запуск проекта локально
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1.  Клонируйте репозиторий:
+    ```bash
+    git clone https://github.com/Stellar13/your-rps-repo.git
+    cd your-rps-repo
+    npm install
+    REACT_APP_SOCKET_URL=http://localhost:8080
+    npm start
